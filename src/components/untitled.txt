@@ -1,0 +1,90 @@
+import React, { useState, useEffect } from "react";
+import QueryDataService from "../services/queries";
+import { useNavigate } from "react-router-dom";
+
+const AskQuery = () => {
+  const navigate = useNavigate();
+  const [userInfo, setUserInfo] = useState();
+  const [allow, setAllow] = useState(false);
+  const [subjects, setSubjects] = useState([]);
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user-info"));
+    console.log(user);
+    if (user) {
+      QueryDataService.getUser(user.eno, user.password).then((response) => {
+        setUserInfo([].concat(response.data));
+        console.log(response.data);
+        console.log(userInfo);
+      });
+    }
+    QueryDataService.getSubjects()
+      .then((res) => {
+        setSubjects(res.data);
+        // console.log(subjects);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+
+    retrieveUser();
+  }, []);
+
+  const retrieveUser = () => {
+    if (userInfo) {
+      setAllow(true);
+    } else {
+      setAllow(false);
+    }
+  };
+  const [Subject, setSubject] = useState("");
+
+  const retrieveSubjects = () => {};
+  const login = () => {
+    return navigate("/");
+  };
+
+  const addQuery = () => {};
+  return (
+    <div>
+      {allow ? (
+        <form>
+          <input
+            type="text"
+            className="row col-sm-4 offset-3"
+            name="name"
+            // value={user.query.Name}
+            disabled
+          />
+          <input
+            type="text"
+            className="row col-sm-4 offset-3"
+            name="eno"
+            // value={userInfo.query.Eno}
+            disabled
+          />
+          <input
+            type="text"
+            className="row col-sm-4 offset-3"
+            name="name"
+            // value={user.query.Email}
+            disabled
+          />
+          <select>
+            {subjects.map((subject) => {
+              return <option value={subject}>{subject}</option>;
+            })}
+          </select>
+        </form>
+      ) : (
+        <div>
+          <h3>You must log in first!</h3>
+          <button className="btn btn-success" onClick={login}>
+            Log In
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default AskQuery;
